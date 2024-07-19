@@ -1,0 +1,171 @@
+
+#SQL QUERIES
+
+# Q1. Write a query in SQL to obtain the name of the physician in alphabetical order. 
+
+SELECT name AS Physician_Name
+FROM physician
+ORDER BY name;
+
+# Q2. Write a query in SQL to obtain the fullname of the patients whose gender is male.
+
+SELECT CONCAT(name,' ',surname) AS Patients_Fullname,gender
+FROM patient
+WHERE gender = 'male';
+
+# Q3. Write a query in SQL to find the name of the nurse who are the head of their department and are registered.
+
+SELECT * FROM nurse
+WHERE position ='Head Nurse' AND registered = "YES";
+
+# Q4. Write a query in SQL to find the name of the nurse who are Team Leader or not registered.
+
+SELECT name,position,registered
+FROM nurse
+WHERE position = 'Team Leader' OR registered = "NO";
+
+# Q5. Write a query to obtain the avg cost of all the medical procedures.
+
+SELECT AVG(cost) as Average_cost
+FROM procedures;
+
+# Q6. Write a query to obtain name and cost of the procedure whose cost is greater than 2000.
+
+SELECT name as Procedure_Name,cost as Procedure_Cost 
+FROM procedures
+WHERE  cost > 2000;
+
+# Q7. Write a query to update the name of the patient to Robert Fernandez having patientid as 5.
+
+UPDATE patient
+SET name = 'Robert',surname = 'Fernandez'
+WHERE PATIENT_ID = 5;
+
+SELECT * FROM patient where patient_id= 5 ;
+
+# Q8. Write a query to drop phone column from patient table.
+
+ALTER TABLE Patient
+DROP phone;
+
+SELECT * FROM PATIENT;
+
+# Q9. Second maximum cost of medical procedure
+
+SELECT name,MAX(cost) as Procedure_cost
+FROM procedures 
+GROUP BY name
+ORDER BY Procedure_cost DESC
+LIMIT 1,1;
+
+#Like Operator
+
+# Q10. Write a query in SQL to obtain the name of the patients starting with letter A.
+
+SELECT CONCAT(name,' ',surname) AS FULL_NAME,gender
+FROM patient
+WHERE CONCAT(name,' ',surname) LIKE 'A%';
+
+# Q11. Write a query in SQL to obtain the name of the patients whose third letter is M.
+
+SELECT CONCAT(name,' ',surname) AS FULL_NAME,gender
+FROM patient
+WHERE CONCAT(name,' ',surname) LIKE '__m%';
+
+# Q12. Write a query in SQL to obtain the name of the patients whose name start with letter J and ends with Z.
+
+SELECT CONCAT(name,' ',surname) AS FULL_NAME,gender
+FROM patient
+WHERE CONCAT(name,' ',surname) LIKE 'j%z';
+
+# Q13. Write a query to obtain patient details having patient_id 11 to 20.
+
+SELECT * 
+FROM patient
+WHERE patient_id between 11 and 20;
+
+#JOINS
+
+# Q14.  Write a query in SQL to obtain the name of the physicians who are the head of each department
+
+SELECT p.name AS Doctor_name,d.dept_name
+FROM physician p
+INNER JOIN department d
+ON p.employeeid = d.head;
+
+# Q15. Write a query in SQL to obtain the name of the patients with their physicians by whom they got their preliminary treatement
+
+SELECT CONCAT(p.name,' ',p.surname) AS patient_name,ph.NAME AS Pri_Treatment
+FROM patient p
+LEFT JOIN physician ph
+ON p.primary_check = ph.employeeid;
+
+# Q16. Write a query in SQL to obtain the name of the physician with the department who are done with affiliation.
+
+select p.name as physician_name,d.dept_name as department_name,primaryaffiliation
+from physician p
+inner join affiliated_with a
+on p.employeeid = a.physicianid
+inner join department d
+on a.departmentid = d.department_id
+where primaryaffiliation='t';
+
+# Q17. Write a query to obtain physician name,position and department they are affiliated with.
+
+SELECT p.name AS physician_name, p.position AS physician_position, d.dept_name AS department_name
+FROM Physician p
+JOIN affiliated_with a 
+ON p.employeeid = a.physicianid
+JOIN department d
+ON a.departmentid = d.department_id;
+
+# Q18. Write a query in SQL to obtain the patient name from which physician they get primary_checkup and also mention the patient diagnosis with prescription.
+select * from patient;
+SELECT ph.employeeid ,PH.NAME AS Physician_Name,PH.POSITION AS Designation,P.PATIENT_ID,CONCAT(P.NAME,' ',P.SURNAME) AS Patient_treated,P.GENDER,PD.DIAGNOSIS,PD.PRESCRIPTION
+FROM patient_diagnosis pd
+LEFT JOIN Physician ph
+ON pd.Physician_id = ph.employeeid
+LEFT JOIN patient P
+ON P.patient_id = PD.patient_id;
+
+#SUBQUERY
+
+# Q19. Write a query in SQL to obtain the maximum cost of the medical procedure.
+
+SELECT name,cost FROM procedures
+WHERE cost IN (SELECT MAX(COST) FROM procedures);
+
+# Q20. Write a query in SQL to obtain the details of patient who has diagnosed with chronic pain.
+
+SELECT * FROM Patient
+WHERE patient_id IN (SELECT Patient_ID FROM patient_diagnosis WHERE Diagnosis = 'Chronic Pain');
+
+# Q21. Write a query in SQL to obtain the procedure name and cost whose cost is greater than the avg cost of all the procedure.
+
+SELECT name as Procedure_name,cost as Procedure_cost
+FROM procedures
+WHERE cost > (SELECT AVG(cost) FROM procedures);
+
+# Q22. Write a query in SQL to obtain the procedure name and cost whose cost is less than the avg cost of all the procedure.
+
+SELECT name as Procedure_name,cost as Procedure_cost
+FROM procedures
+WHERE cost < (SELECT AVG(cost) FROM procedures);
+
+# Q23. Write a query in SQL to obtain the physician name who are either head chief or senior in their respective department.
+
+SELECT * 
+FROM Physician 
+WHERE position IN (SELECT position FROM Physician
+                   WHERE position
+                   LIKE '%Senior%' OR position LIKE '%Head Chief%'
+                   );
+
+# Q24.  Write a query in SQL to obtain the employeeid, physician name and position whose primary affiliation has not been done. 
+
+SELECT * 
+FROM Physician 
+WHERE employeeid IN (SELECT physicianid 
+                     FROM affiliated_with 
+                     WHERE primaryaffiliation = 'f'
+                     );
